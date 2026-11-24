@@ -3,169 +3,87 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Why the average lies: Group 17 Project</title>
+<title>Group 17 Project in simple words</title>
 <style>
-:root{--blue:#2563eb;--red:#dc2626;--green:#16a34a;--ink:#0f172a;--mute:#475569;--bg:#f8fafc}
 *{box-sizing:border-box}
-body{margin:0;font:18px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
-main{max-width:760px;margin:0 auto;padding:0 20px 80px}
-header{background:linear-gradient(135deg,#0b1220,#1d4ed8);color:#fff;padding:56px 20px 48px}
-header div{max-width:760px;margin:0 auto}
-header small{opacity:.8;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
-h1{font-size:clamp(30px,6vw,46px);line-height:1.15;margin:10px 0 14px}
-header p{font-size:20px;opacity:.92;margin:0}
-h2{font-size:28px;margin:56px 0 8px}
-.step{display:inline-block;background:var(--blue);color:#fff;border-radius:999px;padding:2px 14px;font-size:14px;font-weight:600;margin-bottom:6px}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:22px;margin:18px 0}
-.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.big div{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;text-align:center}
-.big b{display:block;font-size:34px;color:var(--blue)}
-.big span{color:var(--mute);font-size:15px}
-.tip{border-left:5px solid var(--blue);background:#eff6ff;padding:12px 16px;border-radius:0 12px 12px 0;margin:18px 0}
-.bad{color:var(--red);font-weight:700}.good{color:var(--green);font-weight:700}
-.dots{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;background:var(--green)}
-.dot.slow{background:var(--red)}
-input[type=range]{width:100%}
-.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
-.nums div{background:#f1f5f9;border-radius:12px;padding:10px}
-.nums b{font-size:26px;display:block}
-canvas{max-width:100%}
-details{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;margin:10px 0}
-summary{cursor:pointer;font-weight:600}
-button.opt{display:block;width:100%;text-align:left;font:inherit;padding:10px 14px;margin:8px 0;border:1px solid #cbd5e1;background:#fff;border-radius:10px;cursor:pointer}
-button.opt:hover{background:#f1f5f9}
-button.opt.right{background:#dcfce7;border-color:var(--green)}button.opt.wrong{background:#fee2e2;border-color:var(--red)}
-dt{font-weight:700;margin-top:12px}dd{margin:2px 0 0;color:var(--mute)}
-a{color:var(--blue)}
-footer{color:var(--mute);font-size:15px;border-top:1px solid #e2e8f0;margin-top:60px;padding-top:20px}
+body{margin:0;font:19px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#0f172a;background:#f8fafc}
+header{background:#1d4ed8;color:#fff;padding:44px 20px}
+.w{max-width:720px;margin:0 auto;padding:0 20px}
+header .w{padding:0}
+h1{font-size:clamp(28px,6vw,42px);line-height:1.2;margin:0 0 10px}
+header p{margin:0;font-size:20px;opacity:.95}
+h2{font-size:26px;margin:48px 0 10px}
+.box{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin:14px 0}
+.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#2563eb;color:#fff;font-weight:700;margin-right:10px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row .box{flex:1 1 200px;margin:6px 0}
+.row b{font-size:22px;display:block;margin-bottom:4px}
+.red{color:#dc2626}.green{color:#16a34a}.blue{color:#2563eb}
+.big{font-size:44px;font-weight:800;line-height:1.1}
+.note{background:#eff6ff;border-left:5px solid #2563eb;border-radius:0 12px 12px 0;padding:12px 16px;margin:16px 0}
+a{color:#2563eb}
+footer{color:#475569;font-size:15px;border-top:1px solid #e2e8f0;margin:50px 0 40px;padding-top:18px}
 </style>
 </head>
 <body>
-<header><div>
-<small>Probability &amp; Statistics Project · Group 17</small>
-<h1>Why "the average" can hide a bad website day</h1>
-<p>We studied a website's response times, hid three problems inside the data, and built a tool that finds them. No statistics knowledge needed to follow along.</p>
+<header><div class="w">
+<h1>Our project in simple words</h1>
+<p>Group 17 · Probability &amp; Statistics</p>
 </div></header>
-<main>
+<div class="w">
 
-<h2>The idea in one minute</h2>
-<p>Imagine you order pizza 10 times. Nine times it comes in 30 minutes. Once it takes 3 hours. The <b>average</b> says "about 45 minutes", which is a lie for both kinds of day. A website has the same problem: a few very slow pages hurt real people, but the average barely notices.</p>
-<div class="tip"><b>Our project in one line:</b> measure how long a website takes to answer, show that the average is a bad summary, and automatically detect when something breaks.</div>
-
-<span class="step">STEP 1</span>
-<h2 style="margin-top:6px">Try it: pizza deliveries</h2>
-<p>Nine deliveries took 30 minutes. Drag the slider to change the tenth one.</p>
-<div class="card">
-  <div class="dots" id="dots"></div>
-  <label for="s">Tenth delivery: <b id="sv">30</b> minutes</label>
-  <input id="s" type="range" min="30" max="300" value="30" step="5">
-  <div class="nums" style="margin-top:12px">
-    <div><b id="avg">30</b>average (mean)</div>
-    <div><b id="med">30</b>middle (median)</div>
-    <div><b id="mx">30</b>slowest</div>
-  </div>
-  <p id="msg" style="margin-bottom:0"></p>
+<h2>What is this project?</h2>
+<div class="box">
+When you open a website, it takes a little time to show up. Companies write down that time for every visit.<br><br>
+<b>Our job:</b> look at those times and find out when the website was slow or broken.
 </div>
-<div class="tip">The <b>middle value (median)</b> stays at 30 while the <b>average</b> moves. And the <b>slowest</b> one is what the unlucky customer feels. Websites report the <b>p99</b>: the time that 99 out of 100 requests beat. It shows the slow end.</div>
 
-<span class="step">STEP 2</span>
-<h2 style="margin-top:6px">Our data</h2>
-<p>Real company logs were not needed: the handbook lets us create <b>realistic fake logs</b>. That is useful because we know exactly which problems we hid, so we can check if our tool finds them.</p>
-<div class="big" id="facts"></div>
-<p>We hid <b>three problems</b>: the checkout page got 6 times slower for 25 minutes, everything slowed for 15 minutes, and the search page started failing for 20 minutes.</p>
+<h2>The pizza story</h2>
+<div class="box">
+You order pizza 10 times.<br>
+<b class="green">9 times</b> it comes in <b>30 minutes</b>.<br>
+<b class="red">1 time</b> it comes in <b>3 hours</b> (180 minutes).<br><br>
+The <b>average</b> is about <span class="big blue" style="font-size:30px">45 minutes</span><br>
+But that is wrong! Nine times it was 30. Once it was 180. Nobody ever waited 45 minutes.
+</div>
+<div class="note"><b>Main lesson:</b> The average can hide a bad day. That is the whole project.</div>
 
-<span class="step">STEP 3</span>
-<h2 style="margin-top:6px">Real numbers: the average vs the slow end</h2>
-<p>In our data, the average is <b id="t-mean"></b> ms but the slowest 1% take over <b id="t-p99"></b> ms. During the checkout problem:</p>
-<div class="card"><canvas id="c2" height="170"></canvas></div>
-<div class="tip">The usual speed (median) did not change at all, the average went up, and the slow end went up the most. <b>One number can never tell the whole story, so we report percentiles.</b></div>
+<h2>3 words you need</h2>
+<div class="row">
+<div class="box"><b class="blue">Average</b>Add all the times, divide by how many. One very slow visit pulls it up.</div>
+<div class="box"><b class="green">Median</b>The middle one. This is what most people really get.</div>
+<div class="box"><b class="red">p99</b>The time that 99 out of 100 visits are faster than. It shows the slowest 1%.</div>
+</div>
 
-<span class="step">STEP 4</span>
-<h2 style="margin-top:6px">Can a computer spot the problems?</h2>
-<p>Yes. The red spikes below are the slow end (p99) over 2 days. Yellow bands are the hidden problems.</p>
-<div class="card"><canvas id="c1" height="190"></canvas></div>
-<p>Our detector cuts time into 5-minute slices and asks "is this slice much slower than normal, or full of errors?". Result: <b class="good" id="det"></b>, and <b class="good" id="fa"></b>.</p>
-<details><summary>How does it decide "much slower"?</summary>
-<p>It compares each 5-minute slice to the usual speed of that page. If it is about 4 "standard steps" above normal (a z-score of 4), that is so unlikely by chance (about 3 in 100,000) that it raises an alert. For errors it uses a coin-flip style test (the binomial test).</p></details>
+<h2>What we did (5 steps)</h2>
+<div class="box"><span class="num">1</span>Made fake website records that look real: <b id="n">172,866</b> visits over 2 days.</div>
+<div class="box"><span class="num">2</span>Hid <b>3 problems</b> inside them. Because we know where, we can test our tool.</div>
+<div class="box"><span class="num">3</span>Saved everything in a database and asked it questions (SQL).</div>
+<div class="box"><span class="num">4</span>Worked out the average, median and p99 for each page.</div>
+<div class="box"><span class="num">5</span>Built a checker. Every 5 minutes it asks: <i>"Is the website much slower than normal? Are there many errors?"</i></div>
 
-<span class="step">STEP 5</span>
-<h2 style="margin-top:6px">Did theory match what we measured?</h2>
-<p>The handbook wants us to compare maths predictions with real results. Three checks:</p>
-<div class="card"><b>1. Same average, different slow end.</b> Maths says websites with the same 100 ms average can have a slowest 1% anywhere from 192 ms to 1,063 ms. Our real data behaves the same way.</div>
-<div class="card"><b>2. Quick estimate vs exact answer.</b> A tiny "sketch" that does not store all the data guessed the slow end within <b id="sk"></b> of the exact answer.</div>
-<div class="card"><b>3. False alarms.</b> Theory predicts how often a quiet day triggers a false alert. On 8 quiet days we measured the same or fewer. Honest note: this means our rule is slightly cautious.</div>
+<h2>What we found</h2>
+<div class="box"><span class="big green">3 / 3</span><br>The checker found all 3 hidden problems.</div>
+<div class="box"><span class="big green">0</span><br>False alarms on normal days. It did not cry wolf.</div>
+<div class="box">In our data the <b>average</b> was <b class="blue" id="mean">116</b> ms, but the slowest 1% took more than <b class="red" id="p99">632</b> ms. About <b class="red" id="x">5</b> times more.<br>So the average hid how bad the slow visits were.</div>
 
-<h2>Quick quiz (to test yourself)</h2>
-<div id="quiz"></div>
+<h2>Learn more</h2>
+<div class="box">
+<a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/BEGINNER_GUIDE.md">Beginner's guide</a> (also has viva questions)<br>
+<a href="https://github.com/Harit23/server-log-anomaly-analyzer">All the code on GitHub</a><br>
+<a href="details.html">Technical page with graphs</a> (only if you want more detail)
+</div>
 
-<h2>Words you need</h2>
-<dl>
-<dt>Latency</dt><dd>How long one request takes to answer, in milliseconds.</dd>
-<dt>Average (mean)</dt><dd>Add everything up, divide by how many. Slow outliers drag it up.</dd>
-<dt>Median</dt><dd>The middle value. Half are faster, half slower.</dd>
-<dt>p95 / p99</dt><dd>95% (or 99%) of requests are faster than this. p99 is "the slow 1%".</dd>
-<dt>Skewed</dt><dd>Most values are small and a few are huge. Latency always looks like this.</dd>
-<dt>Anomaly</dt><dd>Something unusual that should raise an alert.</dd>
-<dt>False alarm</dt><dd>An alert when nothing is wrong.</dd>
-<dt>Hypothesis test</dt><dd>A fair way to ask "could this just be luck?" A tiny p-value says no.</dd>
-</dl>
-
-<h2>Go deeper</h2>
-<p><a href="details.html">Detailed technical page</a> · <a href="https://github.com/Harit23/server-log-anomaly-analyzer">Code on GitHub</a> · <a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/BEGINNER_GUIDE.md">Beginner's guide</a> · <a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/Final_Report.pdf">Final report (PDF)</a></p>
-
-<footer>Group 17 · JG University, School of Engineering (BTech CSE) · Built with assistance from Claude (Anthropic).</footer>
-</main>
-<script src="vendor/chart.umd.js"></script>
+<footer>Group 17 · JG University, School of Engineering (BTech CSE) · Built with help from Claude (Anthropic).</footer>
+</div>
 <script>
-// ---- pizza widget
-const s=document.getElementById('s');
-function pizza(){
-  const x=+s.value, a=[30,30,30,30,30,30,30,30,30,x].sort((p,q)=>p-q);
-  const mean=a.reduce((p,q)=>p+q)/10, med=(a[4]+a[5])/2;
-  document.getElementById('sv').textContent=x;
-  document.getElementById('avg').textContent=mean.toFixed(0);
-  document.getElementById('med').textContent=med;
-  document.getElementById('mx').textContent=x;
-  document.getElementById('dots').innerHTML=[30,30,30,30,30,30,30,30,30,x].map(v=>`<div class="dot ${v>60?'slow':''}">${v}</div>`).join('');
-  document.getElementById('msg').innerHTML = x>60
-    ? `9 out of 10 customers were happy, yet the average says <b>${mean.toFixed(0)} minutes</b>. It describes nobody.`
-    : 'Everything is normal, so all three numbers agree.';
-}
-s.oninput=pizza; pizza();
-// ---- data
 fetch('data/results.json').then(r=>r.json()).then(R=>{
-  const A=R.describe.ALL, inc=R.theory_vs_experiment.mean_hides_p99.incident_all_traffic, D=R.detection;
-  document.getElementById('facts').innerHTML=[
-    [A.n.toLocaleString(),'requests (page visits)'],['6','different pages'],['2 days','of data'],['3','hidden problems']
-  ].map(([b,t])=>`<div><b>${b}</b><span>${t}</span></div>`).join('');
-  t('t-mean',A.mean.toFixed(0)); t('t-p99',A.p99.toFixed(0));
-  t('det',`${D.detected} of ${D.total} problems found within 5 minutes`);
-  t('fa',`0 false alarms across ${D.clean_days} quiet days`);
-  const sk=R.theory_vs_experiment.exact_vs_streaming.ALL.p99.sketch_err_pct; t('sk',Math.abs(sk).toFixed(1)+'%');
-  new Chart(document.getElementById('c2'),{type:'bar',data:{labels:['Usual speed (median)','Average (mean)','Slow end (p99)'],
-    datasets:[{data:[inc.median_change_pct,inc.mean_change_pct,inc.p99_change_pct],backgroundColor:['#16a34a','#64748b','#dc2626']}]},
-    options:{plugins:{legend:{display:false},title:{display:true,text:'How much each number went up during the checkout problem (%)'}},scales:{y:{title:{display:true,text:'% change'}}}}});
-  const m=R.series.minute, labels=m.p99.map((_,i)=>(i/60).toFixed(1));
-  const shade={id:'shade',beforeDatasetsDraw(c){const {ctx,chartArea:a,scales:{x}}=c;ctx.save();ctx.fillStyle='rgba(250,204,21,.45)';
-    R.series.incidents.forEach(i=>{const x1=x.getPixelForValue(i.start_min),x2=x.getPixelForValue(i.end_min);ctx.fillRect(x1-2,a.top,Math.max(x2-x1,4),a.bottom-a.top)});ctx.restore()}};
-  new Chart(document.getElementById('c1'),{type:'line',data:{labels,datasets:[
-    {label:'Slow end (p99)',data:m.p99,borderColor:'#dc2626',borderWidth:1,pointRadius:0},
-    {label:'Average',data:m.mean,borderColor:'#64748b',borderWidth:1,pointRadius:0}]},
-    options:{animation:false,plugins:{title:{display:true,text:'Response time per minute over 48 hours (ms)'}},scales:{x:{ticks:{maxTicksLimit:9},title:{display:true,text:'hours since start'}},y:{title:{display:true,text:'milliseconds'}}}},plugins:[shade]});
-}).catch(()=>{document.getElementById('facts').textContent='Could not load data. Please refresh.'});
-function t(id,v){document.getElementById(id).textContent=v}
-// ---- quiz
-const Q=[
- ['Nine pizzas take 30 min and one takes 3 hours. Which number is most honest about a typical order?',['The average','The median (middle)','The slowest'],1,'The median shows what most customers get. The average is dragged up by one slow order.'],
- ['What does "p99 = 600 ms" mean?',['99% of requests are faster than 600 ms','Requests take 600 ms on average','99 requests failed'],0,'p99 describes the slow end: only 1 in 100 requests is slower.'],
- ['Why did we make fake logs?',['Real logs are illegal','We know the hidden problems, so we can check our detector','Fake data is more accurate'],1,'Knowing the truth lets us measure how many problems the tool catches and how many false alarms it makes.'],
- ['A false alarm is...',['An alert when nothing is wrong','A problem we missed','A slow request'],0,'Too many false alarms make engineers ignore alerts.']
-];
-document.getElementById('quiz').innerHTML=Q.map((q,i)=>`<div class="card"><b>${i+1}. ${q[0]}</b>`+q[1].map((o,j)=>`<button class="opt" data-q="${i}" data-o="${j}">${o}</button>`).join('')+`<div id="ex${i}" style="color:#475569"></div></div>`).join('');
-document.querySelectorAll('button.opt').forEach(b=>b.onclick=()=>{
-  const i=+b.dataset.q,j=+b.dataset.o,ok=j===Q[i][2];b.classList.add(ok?'right':'wrong');
-  document.getElementById('ex'+i).textContent=(ok?'Correct. ':'Not quite. ')+Q[i][3];});
+  const A=R.describe.ALL;
+  document.getElementById('n').textContent=A.n.toLocaleString();
+  document.getElementById('mean').textContent=A.mean.toFixed(0);
+  document.getElementById('p99').textContent=A.p99.toFixed(0);
+  document.getElementById('x').textContent=A.p99_over_mean.toFixed(1);
+}).catch(()=>{});
 </script>
 </body>
 </html>
