@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Server Log Anomaly and Latency Analyzer | Group 17</title>
+<meta name="description" content="Probability and Statistics project: finding slow servers and hidden incidents in web server logs.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%232563eb%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="background:#fef3c7;padding:8px 16px;font:14px system-ui;text-align:center">This is the <b>detailed technical page</b>. New to the topic? <a href="index.html">Start with the simple version</a>.</div>
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Sections">
+  <div class="wrap nav-in">
+    <strong class="brand">Group 17</strong>
+    <div class="links">
+      <a href="#mean">Why the mean lies</a><a href="#explorer">Explorer</a><a href="#detector">Detector</a><a href="#theory">Theory vs experiment</a><a href="#how">How it works</a><a href="#quality">Data &amp; limits</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Probability &amp; Statistics project &middot; Group 17</p>
+    <h1>Server Log Anomaly and Latency Analyzer</h1>
+    <p class="pitch">The average response time says everything is fine. The slowest 1% of requests say otherwise. We use statistics to catch the difference.</p>
+    <div class="cards" id="statCards" aria-live="polite"><p class="muted">Loading results&hellip;</p></div>
+    <p class="note" id="loadError" hidden></p>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+<section id="mean">
+  <h2>1. Why the mean lies</h2>
+  <p class="means"><strong>What this means:</strong> The <em>mean</em> is the usual average. A <em>percentile</em> such as p99 is the response time that 99 out of 100 requests beat, so it shows how bad the slow ones get. When only a few requests go wrong, the mean barely moves but p99 jumps.</p>
+  <div class="panel">
+    <div class="controls">
+      <label><input type="checkbox" data-s="mean" checked> Mean</label>
+      <label><input type="checkbox" data-s="p95" checked> p95</label>
+      <label><input type="checkbox" data-s="p99" checked> p99</label>
+      <label class="sep"><input type="checkbox" id="logY"> Log scale (y-axis)</label>
+    </div>
+    <div class="chartbox tall"><canvas id="timeline" role="img" aria-label="Per-minute mean, p95 and p99 latency over 48 hours with three incidents shaded"></canvas></div>
+    <p class="caption">Latency per minute over 48 hours, all endpoints. Red bands are the three incidents we injected on purpose. Hover over the lines to read exact values.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Same mean, very different tail</h3>
+      <p class="means"><strong>What this means:</strong> These four imaginary servers all average exactly 100 ms. The only thing that changes is the spread (sigma). A wider spread means a much worse p99, yet the mean cannot tell them apart.</p>
+      <div class="tablewrap"><table id="sameMean"></table></div>
+    </div>
+    <div class="panel">
+      <h3>Which statistic notices the incident?</h3>
+      <p class="means"><strong>What this means:</strong> We compared normal traffic with incident traffic. The longer the bar, the more that statistic reacted. The median barely noticed anything.</p>
+      <div class="chartbox"><canvas id="hidesChart" role="img" aria-label="Percent change in median, mean and p99 during incidents"></canvas></div>
+      <div id="hidesNote" class="caption"></div>
+    </div>
+  </div>
+</section>
+
+<section id="explorer">
+  <h2>2. Latency explorer</h2>
+  <p class="means"><strong>What this means:</strong> Pick an endpoint (a URL the server answers) to see how fast it is. Almost every endpoint has a long tail to the right: most requests are quick, a few are very slow. That shape is called <em>right-skewed</em>.</p>
+  <div class="panel">
+    <div class="controls"><label for="epSel"><strong>Endpoint</strong></label>
+      <select id="epSel"></select></div>
+    <div class="metrics" id="metrics"></div>
+    <div class="grid2">
+      <div>
+        <div class="chartbox"><canvas id="histChart" role="img" aria-label="Latency histogram"></canvas></div>
+        <p class="caption" id="histCap"></p>
+      </div>
+      <div>
+        <div class="tablewrap"><table id="pctTable"></table></div>
+        <p class="caption" id="fitCap"></p>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Lognormal or exponential?</h3>
+    <p class="means"><strong>What this means:</strong> To describe the tail with a formula we tried two shapes. The <em>lognormal</em> (the logarithm of latency is bell-shaped) fits far better than the <em>exponential</em> (a plain decay). AIC is a score where <strong>lower is better</strong>; KS measures the gap between the curve and the real data, where smaller is better.</p>
+    <div class="tablewrap"><table id="aicTable"></table></div>
+  </div>
+</section>
+
+<section id="detector">
+  <h2>3. Incident detector</h2>
+  <p class="means"><strong>What this means:</strong> We cut time into 5-minute windows. For each window we ask "how unusual is this window's p95 compared with that endpoint's normal behaviour?" The answer is a <em>z-score</em> (how many standard-deviation steps away from normal). If z is above a threshold, we raise an alarm.</p>
+  <div class="panel">
+    <h3>Try it yourself</h3>
+    <div class="controls">
+      <label for="zSlider"><strong>z-threshold:</strong> <output id="zOut">4.0</output></label>
+      <input type="range" id="zSlider" min="2" max="5" step="0.1" value="4">
+    </div>
+    <div class="metrics" id="detStats"></div>
+    <p class="means"><strong>What this means:</strong> Lower the threshold and the detector becomes jumpy (more alarms, some false). Raise it and it becomes strict (fewer alarms, but it might miss real problems). Red cells are flagged windows; the grey-blue bands behind them mark when incidents truly happened.</p>
+    <div class="strip-legend"><span><i class="sw sw-flag"></i> flagged</span><span><i class="sw sw-ok"></i> normal</span><span><i class="sw sw-truth"></i> true incident period</span></div>
+    <div id="strips" class="strips"></div>
+    <p class="caption">Each row is an endpoint, each column a 5-minute window (576 windows = 48 hours). Error-rate alarms are fixed at the original setting because they use a separate rule.</p>
+  </div>
+  <div class="panel">
+    <h3>Detection results (threshold z = <span class="zused"></span>)</h3>
+    <p class="means"><strong>What this means:</strong> Each row is an incident we injected. "Delay" is how many minutes passed before the detector noticed.</p>
+    <div class="tablewrap"><table id="truthTable"></table></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3>Test: search error rate</h3><div id="errTest"></div></div>
+    <div class="panel"><h3>Test: checkout latency</h3><div id="latTest"></div></div>
+  </div>
+</section>
+
+<section id="theory">
+  <h2>4. Theory vs experiment</h2>
+  <h3>(a) False alarms: what the math predicts vs what happened</h3>
+  <p class="means"><strong>What this means:</strong> If traffic is perfectly normal, a threshold of z still raises a false alarm by pure chance at a rate the bell curve can predict. We tested that prediction on clean days with no incidents.</p>
+  <div class="panel">
+    <div class="chartbox"><canvas id="faChart" role="img" aria-label="Theoretical and measured false alarm rate by z threshold"></canvas></div>
+    <div class="tablewrap"><table id="faTable"></table></div>
+    <p class="note">Honest note: the measured rate is <em>below</em> the theory. Windows contain few requests and we estimate the spread (sigma) robustly, so the detector is a little more conservative than the idealised math. Lower than predicted is the safe direction, but it is a mismatch we want to be upfront about.</p>
+  </div>
+  <h3>(b) Exact vs streaming percentiles</h3>
+  <p class="means"><strong>What this means:</strong> A busy server cannot store every request. Streaming methods estimate percentiles on the fly using little memory. P&sup2; is a small moving estimator; the log-bucket sketch counts requests in bins. Smaller error is better.</p>
+  <div class="panel"><div class="tablewrap"><table id="streamTable"></table></div>
+    <p class="caption" id="streamCap"></p></div>
+  <h3>(c) Lognormal prediction vs measured percentiles</h3>
+  <p class="means"><strong>What this means:</strong> After fitting a lognormal curve to each endpoint, we asked it to predict p50, p95 and p99 and compared with reality. Values that match show the model is trustworthy.</p>
+  <div class="panel"><div class="tablewrap"><table id="lnTable"></table></div></div>
+</section>
+
+<section id="how">
+  <h2>5. How it works</h2>
+  <p class="means"><strong>What this means:</strong> The whole project is a simple chain. Each step feeds the next, and the last step is the page you are reading.</p>
+  <ol class="pipeline">
+    <li><span class="step">1</span><h4>Generate logs</h4><p>Simulate 48 hours of web traffic with known incidents.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/generator" rel="noopener">generator/</a></li>
+    <li><span class="step">2</span><h4>Parse into SQLite</h4><p>Read each log line, clean it, store it in a table.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/parser" rel="noopener">parser/</a></li>
+    <li><span class="step">3</span><h4>SQL percentiles &amp; windows</h4><p>Group by endpoint and 5-minute window.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/sql" rel="noopener">sql/</a></li>
+    <li><span class="step">4</span><h4>Stats + detectors</h4><p>Fit distributions, run tests, flag unusual windows.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/analysis" rel="noopener">analysis/</a></li>
+    <li><span class="step">5</span><h4>This site</h4><p>results.json drives every chart on this page.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/docs" rel="noopener">docs/</a></li>
+  </ol>
+  <p class="caption">Repository: <a href="https://github.com/Harit23/server-log-anomaly-analyzer" rel="noopener">github.com/Harit23/server-log-anomaly-analyzer</a></p>
+  <details class="panel">
+    <summary>Static figures from the analysis report</summary>
+    <div class="figs">
+      <figure><img src="img/fig1_skew.png" alt="Skewed latency distribution" loading="lazy"><figcaption>Skew</figcaption></figure>
+      <figure><img src="img/fig2_percentiles.png" alt="Percentiles per endpoint" loading="lazy"><figcaption>Percentiles</figcaption></figure>
+      <figure><img src="img/fig3_timeline.png" alt="Timeline of latency" loading="lazy"><figcaption>Timeline</figcaption></figure>
+      <figure><img src="img/fig4_mean_vs_p99.png" alt="Mean versus p99" loading="lazy"><figcaption>Mean vs p99</figcaption></figure>
+      <figure><img src="img/fig5_false_alarms.png" alt="False alarm sweep" loading="lazy"><figcaption>False alarms</figcaption></figure>
+      <figure><img src="img/fig6_streaming.png" alt="Streaming percentile error" loading="lazy"><figcaption>Streaming</figcaption></figure>
+      <figure><img src="img/fig7_qq.png" alt="Q-Q plot" loading="lazy"><figcaption>Q-Q plot</figcaption></figure>
+    </div>
+  </details>
+</section>
+
+<section id="quality">
+  <h2>6. Data quality and limitations</h2>
+  <p class="means"><strong>What this means:</strong> Before analysing, we checked the logs for broken or odd rows. Below is what we looked for and what we found.</p>
+  <div class="panel"><div class="tablewrap"><table id="dqTable"></table></div></div>
+  <h3>Limitations</h3>
+  <ul class="limits">
+    <li><strong>Synthetic data.</strong> The logs are simulated, not from a real production server, so real traffic may be messier.</li>
+    <li><strong>Incidents are known.</strong> We injected the three incidents ourselves, so "detected 3 of 3" is easier than finding unknown problems.</li>
+    <li><strong>Latency ignores load.</strong> In the simulation, latency does not rise when traffic rises, which real servers often do.</li>
+    <li><strong>Only two days.</strong> A short span cannot show weekly patterns or slow drifts.</li>
+  </ul>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p><strong>Group 17</strong> &middot; JG University, School of Engineering &middot; B.Tech Computer Science &amp; Engineering &middot; Probability &amp; Statistics</p>
+    <ul class="members"><li>Member 1</li><li>Member 2</li><li>Member 3</li><li>Member 4</li><li>Member 5</li></ul>
+    <p class="muted">Team names to be filled in.</p>
+    <p class="muted">Built with assistance from Claude (Anthropic).</p>
+  </div>
+</footer>
+
+<script src="vendor/chart.umd.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

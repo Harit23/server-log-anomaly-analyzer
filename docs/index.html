@@ -3,180 +3,169 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Server Log Anomaly and Latency Analyzer | Group 17</title>
-<meta name="description" content="Probability and Statistics project: finding slow servers and hidden incidents in web server logs.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%232563eb%27/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css">
+<title>Why the average lies: Group 17 Project</title>
+<style>
+:root{--blue:#2563eb;--red:#dc2626;--green:#16a34a;--ink:#0f172a;--mute:#475569;--bg:#f8fafc}
+*{box-sizing:border-box}
+body{margin:0;font:18px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+main{max-width:760px;margin:0 auto;padding:0 20px 80px}
+header{background:linear-gradient(135deg,#0b1220,#1d4ed8);color:#fff;padding:56px 20px 48px}
+header div{max-width:760px;margin:0 auto}
+header small{opacity:.8;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.15;margin:10px 0 14px}
+header p{font-size:20px;opacity:.92;margin:0}
+h2{font-size:28px;margin:56px 0 8px}
+.step{display:inline-block;background:var(--blue);color:#fff;border-radius:999px;padding:2px 14px;font-size:14px;font-weight:600;margin-bottom:6px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:22px;margin:18px 0}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.big div{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;text-align:center}
+.big b{display:block;font-size:34px;color:var(--blue)}
+.big span{color:var(--mute);font-size:15px}
+.tip{border-left:5px solid var(--blue);background:#eff6ff;padding:12px 16px;border-radius:0 12px 12px 0;margin:18px 0}
+.bad{color:var(--red);font-weight:700}.good{color:var(--green);font-weight:700}
+.dots{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;background:var(--green)}
+.dot.slow{background:var(--red)}
+input[type=range]{width:100%}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.nums div{background:#f1f5f9;border-radius:12px;padding:10px}
+.nums b{font-size:26px;display:block}
+canvas{max-width:100%}
+details{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}
+button.opt{display:block;width:100%;text-align:left;font:inherit;padding:10px 14px;margin:8px 0;border:1px solid #cbd5e1;background:#fff;border-radius:10px;cursor:pointer}
+button.opt:hover{background:#f1f5f9}
+button.opt.right{background:#dcfce7;border-color:var(--green)}button.opt.wrong{background:#fee2e2;border-color:var(--red)}
+dt{font-weight:700;margin-top:12px}dd{margin:2px 0 0;color:var(--mute)}
+a{color:var(--blue)}
+footer{color:var(--mute);font-size:15px;border-top:1px solid #e2e8f0;margin-top:60px;padding-top:20px}
+</style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-<nav class="nav" aria-label="Sections">
-  <div class="wrap nav-in">
-    <strong class="brand">Group 17</strong>
-    <div class="links">
-      <a href="#mean">Why the mean lies</a><a href="#explorer">Explorer</a><a href="#detector">Detector</a><a href="#theory">Theory vs experiment</a><a href="#how">How it works</a><a href="#quality">Data &amp; limits</a>
-    </div>
-  </div>
-</nav>
+<header><div>
+<small>Probability &amp; Statistics Project · Group 17</small>
+<h1>Why "the average" can hide a bad website day</h1>
+<p>We studied a website's response times, hid three problems inside the data, and built a tool that finds them. No statistics knowledge needed to follow along.</p>
+</div></header>
+<main>
 
-<header class="hero">
-  <div class="wrap">
-    <p class="eyebrow">Probability &amp; Statistics project &middot; Group 17</p>
-    <h1>Server Log Anomaly and Latency Analyzer</h1>
-    <p class="pitch">The average response time says everything is fine. The slowest 1% of requests say otherwise. We use statistics to catch the difference.</p>
-    <div class="cards" id="statCards" aria-live="polite"><p class="muted">Loading results&hellip;</p></div>
-    <p class="note" id="loadError" hidden></p>
-  </div>
-</header>
+<h2>The idea in one minute</h2>
+<p>Imagine you order pizza 10 times. Nine times it comes in 30 minutes. Once it takes 3 hours. The <b>average</b> says "about 45 minutes", which is a lie for both kinds of day. A website has the same problem: a few very slow pages hurt real people, but the average barely notices.</p>
+<div class="tip"><b>Our project in one line:</b> measure how long a website takes to answer, show that the average is a bad summary, and automatically detect when something breaks.</div>
 
-<main id="main" class="wrap">
+<span class="step">STEP 1</span>
+<h2 style="margin-top:6px">Try it: pizza deliveries</h2>
+<p>Nine deliveries took 30 minutes. Drag the slider to change the tenth one.</p>
+<div class="card">
+  <div class="dots" id="dots"></div>
+  <label for="s">Tenth delivery: <b id="sv">30</b> minutes</label>
+  <input id="s" type="range" min="30" max="300" value="30" step="5">
+  <div class="nums" style="margin-top:12px">
+    <div><b id="avg">30</b>average (mean)</div>
+    <div><b id="med">30</b>middle (median)</div>
+    <div><b id="mx">30</b>slowest</div>
+  </div>
+  <p id="msg" style="margin-bottom:0"></p>
+</div>
+<div class="tip">The <b>middle value (median)</b> stays at 30 while the <b>average</b> moves. And the <b>slowest</b> one is what the unlucky customer feels. Websites report the <b>p99</b>: the time that 99 out of 100 requests beat. It shows the slow end.</div>
 
-<section id="mean">
-  <h2>1. Why the mean lies</h2>
-  <p class="means"><strong>What this means:</strong> The <em>mean</em> is the usual average. A <em>percentile</em> such as p99 is the response time that 99 out of 100 requests beat, so it shows how bad the slow ones get. When only a few requests go wrong, the mean barely moves but p99 jumps.</p>
-  <div class="panel">
-    <div class="controls">
-      <label><input type="checkbox" data-s="mean" checked> Mean</label>
-      <label><input type="checkbox" data-s="p95" checked> p95</label>
-      <label><input type="checkbox" data-s="p99" checked> p99</label>
-      <label class="sep"><input type="checkbox" id="logY"> Log scale (y-axis)</label>
-    </div>
-    <div class="chartbox tall"><canvas id="timeline" role="img" aria-label="Per-minute mean, p95 and p99 latency over 48 hours with three incidents shaded"></canvas></div>
-    <p class="caption">Latency per minute over 48 hours, all endpoints. Red bands are the three incidents we injected on purpose. Hover over the lines to read exact values.</p>
-  </div>
-  <div class="grid2">
-    <div class="panel">
-      <h3>Same mean, very different tail</h3>
-      <p class="means"><strong>What this means:</strong> These four imaginary servers all average exactly 100 ms. The only thing that changes is the spread (sigma). A wider spread means a much worse p99, yet the mean cannot tell them apart.</p>
-      <div class="tablewrap"><table id="sameMean"></table></div>
-    </div>
-    <div class="panel">
-      <h3>Which statistic notices the incident?</h3>
-      <p class="means"><strong>What this means:</strong> We compared normal traffic with incident traffic. The longer the bar, the more that statistic reacted. The median barely noticed anything.</p>
-      <div class="chartbox"><canvas id="hidesChart" role="img" aria-label="Percent change in median, mean and p99 during incidents"></canvas></div>
-      <div id="hidesNote" class="caption"></div>
-    </div>
-  </div>
-</section>
+<span class="step">STEP 2</span>
+<h2 style="margin-top:6px">Our data</h2>
+<p>Real company logs were not needed: the handbook lets us create <b>realistic fake logs</b>. That is useful because we know exactly which problems we hid, so we can check if our tool finds them.</p>
+<div class="big" id="facts"></div>
+<p>We hid <b>three problems</b>: the checkout page got 6 times slower for 25 minutes, everything slowed for 15 minutes, and the search page started failing for 20 minutes.</p>
 
-<section id="explorer">
-  <h2>2. Latency explorer</h2>
-  <p class="means"><strong>What this means:</strong> Pick an endpoint (a URL the server answers) to see how fast it is. Almost every endpoint has a long tail to the right: most requests are quick, a few are very slow. That shape is called <em>right-skewed</em>.</p>
-  <div class="panel">
-    <div class="controls"><label for="epSel"><strong>Endpoint</strong></label>
-      <select id="epSel"></select></div>
-    <div class="metrics" id="metrics"></div>
-    <div class="grid2">
-      <div>
-        <div class="chartbox"><canvas id="histChart" role="img" aria-label="Latency histogram"></canvas></div>
-        <p class="caption" id="histCap"></p>
-      </div>
-      <div>
-        <div class="tablewrap"><table id="pctTable"></table></div>
-        <p class="caption" id="fitCap"></p>
-      </div>
-    </div>
-  </div>
-  <div class="panel">
-    <h3>Lognormal or exponential?</h3>
-    <p class="means"><strong>What this means:</strong> To describe the tail with a formula we tried two shapes. The <em>lognormal</em> (the logarithm of latency is bell-shaped) fits far better than the <em>exponential</em> (a plain decay). AIC is a score where <strong>lower is better</strong>; KS measures the gap between the curve and the real data, where smaller is better.</p>
-    <div class="tablewrap"><table id="aicTable"></table></div>
-  </div>
-</section>
+<span class="step">STEP 3</span>
+<h2 style="margin-top:6px">Real numbers: the average vs the slow end</h2>
+<p>In our data, the average is <b id="t-mean"></b> ms but the slowest 1% take over <b id="t-p99"></b> ms. During the checkout problem:</p>
+<div class="card"><canvas id="c2" height="170"></canvas></div>
+<div class="tip">The usual speed (median) did not change at all, the average went up, and the slow end went up the most. <b>One number can never tell the whole story, so we report percentiles.</b></div>
 
-<section id="detector">
-  <h2>3. Incident detector</h2>
-  <p class="means"><strong>What this means:</strong> We cut time into 5-minute windows. For each window we ask "how unusual is this window's p95 compared with that endpoint's normal behaviour?" The answer is a <em>z-score</em> (how many standard-deviation steps away from normal). If z is above a threshold, we raise an alarm.</p>
-  <div class="panel">
-    <h3>Try it yourself</h3>
-    <div class="controls">
-      <label for="zSlider"><strong>z-threshold:</strong> <output id="zOut">4.0</output></label>
-      <input type="range" id="zSlider" min="2" max="5" step="0.1" value="4">
-    </div>
-    <div class="metrics" id="detStats"></div>
-    <p class="means"><strong>What this means:</strong> Lower the threshold and the detector becomes jumpy (more alarms, some false). Raise it and it becomes strict (fewer alarms, but it might miss real problems). Red cells are flagged windows; the grey-blue bands behind them mark when incidents truly happened.</p>
-    <div class="strip-legend"><span><i class="sw sw-flag"></i> flagged</span><span><i class="sw sw-ok"></i> normal</span><span><i class="sw sw-truth"></i> true incident period</span></div>
-    <div id="strips" class="strips"></div>
-    <p class="caption">Each row is an endpoint, each column a 5-minute window (576 windows = 48 hours). Error-rate alarms are fixed at the original setting because they use a separate rule.</p>
-  </div>
-  <div class="panel">
-    <h3>Detection results (threshold z = <span class="zused"></span>)</h3>
-    <p class="means"><strong>What this means:</strong> Each row is an incident we injected. "Delay" is how many minutes passed before the detector noticed.</p>
-    <div class="tablewrap"><table id="truthTable"></table></div>
-  </div>
-  <div class="grid2">
-    <div class="panel"><h3>Test: search error rate</h3><div id="errTest"></div></div>
-    <div class="panel"><h3>Test: checkout latency</h3><div id="latTest"></div></div>
-  </div>
-</section>
+<span class="step">STEP 4</span>
+<h2 style="margin-top:6px">Can a computer spot the problems?</h2>
+<p>Yes. The red spikes below are the slow end (p99) over 2 days. Yellow bands are the hidden problems.</p>
+<div class="card"><canvas id="c1" height="190"></canvas></div>
+<p>Our detector cuts time into 5-minute slices and asks "is this slice much slower than normal, or full of errors?". Result: <b class="good" id="det"></b>, and <b class="good" id="fa"></b>.</p>
+<details><summary>How does it decide "much slower"?</summary>
+<p>It compares each 5-minute slice to the usual speed of that page. If it is about 4 "standard steps" above normal (a z-score of 4), that is so unlikely by chance (about 3 in 100,000) that it raises an alert. For errors it uses a coin-flip style test (the binomial test).</p></details>
 
-<section id="theory">
-  <h2>4. Theory vs experiment</h2>
-  <h3>(a) False alarms: what the math predicts vs what happened</h3>
-  <p class="means"><strong>What this means:</strong> If traffic is perfectly normal, a threshold of z still raises a false alarm by pure chance at a rate the bell curve can predict. We tested that prediction on clean days with no incidents.</p>
-  <div class="panel">
-    <div class="chartbox"><canvas id="faChart" role="img" aria-label="Theoretical and measured false alarm rate by z threshold"></canvas></div>
-    <div class="tablewrap"><table id="faTable"></table></div>
-    <p class="note">Honest note: the measured rate is <em>below</em> the theory. Windows contain few requests and we estimate the spread (sigma) robustly, so the detector is a little more conservative than the idealised math. Lower than predicted is the safe direction, but it is a mismatch we want to be upfront about.</p>
-  </div>
-  <h3>(b) Exact vs streaming percentiles</h3>
-  <p class="means"><strong>What this means:</strong> A busy server cannot store every request. Streaming methods estimate percentiles on the fly using little memory. P&sup2; is a small moving estimator; the log-bucket sketch counts requests in bins. Smaller error is better.</p>
-  <div class="panel"><div class="tablewrap"><table id="streamTable"></table></div>
-    <p class="caption" id="streamCap"></p></div>
-  <h3>(c) Lognormal prediction vs measured percentiles</h3>
-  <p class="means"><strong>What this means:</strong> After fitting a lognormal curve to each endpoint, we asked it to predict p50, p95 and p99 and compared with reality. Values that match show the model is trustworthy.</p>
-  <div class="panel"><div class="tablewrap"><table id="lnTable"></table></div></div>
-</section>
+<span class="step">STEP 5</span>
+<h2 style="margin-top:6px">Did theory match what we measured?</h2>
+<p>The handbook wants us to compare maths predictions with real results. Three checks:</p>
+<div class="card"><b>1. Same average, different slow end.</b> Maths says websites with the same 100 ms average can have a slowest 1% anywhere from 192 ms to 1,063 ms. Our real data behaves the same way.</div>
+<div class="card"><b>2. Quick estimate vs exact answer.</b> A tiny "sketch" that does not store all the data guessed the slow end within <b id="sk"></b> of the exact answer.</div>
+<div class="card"><b>3. False alarms.</b> Theory predicts how often a quiet day triggers a false alert. On 8 quiet days we measured the same or fewer. Honest note: this means our rule is slightly cautious.</div>
 
-<section id="how">
-  <h2>5. How it works</h2>
-  <p class="means"><strong>What this means:</strong> The whole project is a simple chain. Each step feeds the next, and the last step is the page you are reading.</p>
-  <ol class="pipeline">
-    <li><span class="step">1</span><h4>Generate logs</h4><p>Simulate 48 hours of web traffic with known incidents.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/generator" rel="noopener">generator/</a></li>
-    <li><span class="step">2</span><h4>Parse into SQLite</h4><p>Read each log line, clean it, store it in a table.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/parser" rel="noopener">parser/</a></li>
-    <li><span class="step">3</span><h4>SQL percentiles &amp; windows</h4><p>Group by endpoint and 5-minute window.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/sql" rel="noopener">sql/</a></li>
-    <li><span class="step">4</span><h4>Stats + detectors</h4><p>Fit distributions, run tests, flag unusual windows.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/analysis" rel="noopener">analysis/</a></li>
-    <li><span class="step">5</span><h4>This site</h4><p>results.json drives every chart on this page.</p><a href="https://github.com/Harit23/server-log-anomaly-analyzer/tree/main/docs" rel="noopener">docs/</a></li>
-  </ol>
-  <p class="caption">Repository: <a href="https://github.com/Harit23/server-log-anomaly-analyzer" rel="noopener">github.com/Harit23/server-log-anomaly-analyzer</a></p>
-  <details class="panel">
-    <summary>Static figures from the analysis report</summary>
-    <div class="figs">
-      <figure><img src="img/fig1_skew.png" alt="Skewed latency distribution" loading="lazy"><figcaption>Skew</figcaption></figure>
-      <figure><img src="img/fig2_percentiles.png" alt="Percentiles per endpoint" loading="lazy"><figcaption>Percentiles</figcaption></figure>
-      <figure><img src="img/fig3_timeline.png" alt="Timeline of latency" loading="lazy"><figcaption>Timeline</figcaption></figure>
-      <figure><img src="img/fig4_mean_vs_p99.png" alt="Mean versus p99" loading="lazy"><figcaption>Mean vs p99</figcaption></figure>
-      <figure><img src="img/fig5_false_alarms.png" alt="False alarm sweep" loading="lazy"><figcaption>False alarms</figcaption></figure>
-      <figure><img src="img/fig6_streaming.png" alt="Streaming percentile error" loading="lazy"><figcaption>Streaming</figcaption></figure>
-      <figure><img src="img/fig7_qq.png" alt="Q-Q plot" loading="lazy"><figcaption>Q-Q plot</figcaption></figure>
-    </div>
-  </details>
-</section>
+<h2>Quick quiz (to test yourself)</h2>
+<div id="quiz"></div>
 
-<section id="quality">
-  <h2>6. Data quality and limitations</h2>
-  <p class="means"><strong>What this means:</strong> Before analysing, we checked the logs for broken or odd rows. Below is what we looked for and what we found.</p>
-  <div class="panel"><div class="tablewrap"><table id="dqTable"></table></div></div>
-  <h3>Limitations</h3>
-  <ul class="limits">
-    <li><strong>Synthetic data.</strong> The logs are simulated, not from a real production server, so real traffic may be messier.</li>
-    <li><strong>Incidents are known.</strong> We injected the three incidents ourselves, so "detected 3 of 3" is easier than finding unknown problems.</li>
-    <li><strong>Latency ignores load.</strong> In the simulation, latency does not rise when traffic rises, which real servers often do.</li>
-    <li><strong>Only two days.</strong> A short span cannot show weekly patterns or slow drifts.</li>
-  </ul>
-</section>
+<h2>Words you need</h2>
+<dl>
+<dt>Latency</dt><dd>How long one request takes to answer, in milliseconds.</dd>
+<dt>Average (mean)</dt><dd>Add everything up, divide by how many. Slow outliers drag it up.</dd>
+<dt>Median</dt><dd>The middle value. Half are faster, half slower.</dd>
+<dt>p95 / p99</dt><dd>95% (or 99%) of requests are faster than this. p99 is "the slow 1%".</dd>
+<dt>Skewed</dt><dd>Most values are small and a few are huge. Latency always looks like this.</dd>
+<dt>Anomaly</dt><dd>Something unusual that should raise an alert.</dd>
+<dt>False alarm</dt><dd>An alert when nothing is wrong.</dd>
+<dt>Hypothesis test</dt><dd>A fair way to ask "could this just be luck?" A tiny p-value says no.</dd>
+</dl>
+
+<h2>Go deeper</h2>
+<p><a href="details.html">Detailed technical page</a> · <a href="https://github.com/Harit23/server-log-anomaly-analyzer">Code on GitHub</a> · <a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/BEGINNER_GUIDE.md">Beginner's guide</a> · <a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/Final_Report.pdf">Final report (PDF)</a></p>
+
+<footer>Group 17 · JG University, School of Engineering (BTech CSE) · Built with assistance from Claude (Anthropic).</footer>
 </main>
-
-<footer class="footer">
-  <div class="wrap">
-    <p><strong>Group 17</strong> &middot; JG University, School of Engineering &middot; B.Tech Computer Science &amp; Engineering &middot; Probability &amp; Statistics</p>
-    <ul class="members"><li>Member 1</li><li>Member 2</li><li>Member 3</li><li>Member 4</li><li>Member 5</li></ul>
-    <p class="muted">Team names to be filled in.</p>
-    <p class="muted">Built with assistance from Claude (Anthropic).</p>
-  </div>
-</footer>
-
 <script src="vendor/chart.umd.js"></script>
-<script src="app.js"></script>
+<script>
+// ---- pizza widget
+const s=document.getElementById('s');
+function pizza(){
+  const x=+s.value, a=[30,30,30,30,30,30,30,30,30,x].sort((p,q)=>p-q);
+  const mean=a.reduce((p,q)=>p+q)/10, med=(a[4]+a[5])/2;
+  document.getElementById('sv').textContent=x;
+  document.getElementById('avg').textContent=mean.toFixed(0);
+  document.getElementById('med').textContent=med;
+  document.getElementById('mx').textContent=x;
+  document.getElementById('dots').innerHTML=[30,30,30,30,30,30,30,30,30,x].map(v=>`<div class="dot ${v>60?'slow':''}">${v}</div>`).join('');
+  document.getElementById('msg').innerHTML = x>60
+    ? `9 out of 10 customers were happy, yet the average says <b>${mean.toFixed(0)} minutes</b>. It describes nobody.`
+    : 'Everything is normal, so all three numbers agree.';
+}
+s.oninput=pizza; pizza();
+// ---- data
+fetch('data/results.json').then(r=>r.json()).then(R=>{
+  const A=R.describe.ALL, inc=R.theory_vs_experiment.mean_hides_p99.incident_all_traffic, D=R.detection;
+  document.getElementById('facts').innerHTML=[
+    [A.n.toLocaleString(),'requests (page visits)'],['6','different pages'],['2 days','of data'],['3','hidden problems']
+  ].map(([b,t])=>`<div><b>${b}</b><span>${t}</span></div>`).join('');
+  t('t-mean',A.mean.toFixed(0)); t('t-p99',A.p99.toFixed(0));
+  t('det',`${D.detected} of ${D.total} problems found within 5 minutes`);
+  t('fa',`0 false alarms across ${D.clean_days} quiet days`);
+  const sk=R.theory_vs_experiment.exact_vs_streaming.ALL.p99.sketch_err_pct; t('sk',Math.abs(sk).toFixed(1)+'%');
+  new Chart(document.getElementById('c2'),{type:'bar',data:{labels:['Usual speed (median)','Average (mean)','Slow end (p99)'],
+    datasets:[{data:[inc.median_change_pct,inc.mean_change_pct,inc.p99_change_pct],backgroundColor:['#16a34a','#64748b','#dc2626']}]},
+    options:{plugins:{legend:{display:false},title:{display:true,text:'How much each number went up during the checkout problem (%)'}},scales:{y:{title:{display:true,text:'% change'}}}}});
+  const m=R.series.minute, labels=m.p99.map((_,i)=>(i/60).toFixed(1));
+  const shade={id:'shade',beforeDatasetsDraw(c){const {ctx,chartArea:a,scales:{x}}=c;ctx.save();ctx.fillStyle='rgba(250,204,21,.45)';
+    R.series.incidents.forEach(i=>{const x1=x.getPixelForValue(i.start_min),x2=x.getPixelForValue(i.end_min);ctx.fillRect(x1-2,a.top,Math.max(x2-x1,4),a.bottom-a.top)});ctx.restore()}};
+  new Chart(document.getElementById('c1'),{type:'line',data:{labels,datasets:[
+    {label:'Slow end (p99)',data:m.p99,borderColor:'#dc2626',borderWidth:1,pointRadius:0},
+    {label:'Average',data:m.mean,borderColor:'#64748b',borderWidth:1,pointRadius:0}]},
+    options:{animation:false,plugins:{title:{display:true,text:'Response time per minute over 48 hours (ms)'}},scales:{x:{ticks:{maxTicksLimit:9},title:{display:true,text:'hours since start'}},y:{title:{display:true,text:'milliseconds'}}}},plugins:[shade]});
+}).catch(()=>{document.getElementById('facts').textContent='Could not load data. Please refresh.'});
+function t(id,v){document.getElementById(id).textContent=v}
+// ---- quiz
+const Q=[
+ ['Nine pizzas take 30 min and one takes 3 hours. Which number is most honest about a typical order?',['The average','The median (middle)','The slowest'],1,'The median shows what most customers get. The average is dragged up by one slow order.'],
+ ['What does "p99 = 600 ms" mean?',['99% of requests are faster than 600 ms','Requests take 600 ms on average','99 requests failed'],0,'p99 describes the slow end: only 1 in 100 requests is slower.'],
+ ['Why did we make fake logs?',['Real logs are illegal','We know the hidden problems, so we can check our detector','Fake data is more accurate'],1,'Knowing the truth lets us measure how many problems the tool catches and how many false alarms it makes.'],
+ ['A false alarm is...',['An alert when nothing is wrong','A problem we missed','A slow request'],0,'Too many false alarms make engineers ignore alerts.']
+];
+document.getElementById('quiz').innerHTML=Q.map((q,i)=>`<div class="card"><b>${i+1}. ${q[0]}</b>`+q[1].map((o,j)=>`<button class="opt" data-q="${i}" data-o="${j}">${o}</button>`).join('')+`<div id="ex${i}" style="color:#475569"></div></div>`).join('');
+document.querySelectorAll('button.opt').forEach(b=>b.onclick=()=>{
+  const i=+b.dataset.q,j=+b.dataset.o,ok=j===Q[i][2];b.classList.add(ok?'right':'wrong');
+  document.getElementById('ex'+i).textContent=(ok?'Correct. ':'Not quite. ')+Q[i][3];});
+</script>
 </body>
 </html>
