@@ -68,3 +68,4 @@ summary{cursor:pointer;font-weight:600}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}.kv dt{color:var(--mut)}.kv dd{margin:0;font-weight:600}
 .verdict{padding:10px 12px;border-radius:10px;background:var(--tint);margin-top:10px;font-size:15px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.grid2>*,.strips>*,.panel{min-width:0}.strips{grid-template-columns:90px minmax(0,1fr)}
