@@ -1,0 +1,4 @@
+data/logs.db
+data/*.tmp
+__pycache__/
+*.pyc
