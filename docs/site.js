@@ -182,7 +182,7 @@
     var W = Math.max(300, Math.floor(host.clientWidth));
     var I = D.theory_vs_experiment.mean_hides_p99.incident_all_traffic;
     var rows = [
-      { name: 'Average', note: 'what most dashboards show', v: I.mean_change_pct, color: C.trace },
+      { name: 'Average', note: 'what most reports show', v: I.mean_change_pct, color: C.trace },
       { name: 'Median', note: 'the typical visit', v: I.median_change_pct, color: C.trace },
       { name: 'p99', note: 'the slowest 1% of visits', v: I.p99_change_pct, color: C.amber, textColor: C.amberInk }
     ];
@@ -213,12 +213,12 @@
 
   /* ---------- 5. Pages ---------- */
   var FRIENDLY = {
-    '/': ['Home page', '/'],
-    '/api/search': ['Search', '/api/search'],
-    '/api/products': ['Products', '/api/products'],
-    '/api/login': ['Login', '/api/login'],
-    '/api/checkout': ['Checkout', '/api/checkout'],
-    '/static/app.js': ['App file', '/static/app.js']
+    '/': ['Home page', ''],
+    '/api/search': ['Search', ''],
+    '/api/products': ['Products', ''],
+    '/api/login': ['Login', ''],
+    '/api/checkout': ['Checkout', ''],
+    '/static/app.js': ['App file', '']
   };
 
   function drawPages(D, host) {

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=2">
+<link rel="stylesheet" href="site.css?v=3">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -20,7 +20,13 @@
 <header class="hero wrap">
   <p class="kicker">Group 17 · Probability &amp; Statistics</p>
   <h1>We watched <span data-fill="requests">172,866</span> website visits and caught every slowdown.</h1>
-  <p class="lede">A program that reads a website's visit records, measures how long each page takes to load, and automatically flags the moments when the site suddenly becomes unusually slow or starts showing errors.</p>
+  <p class="lede">Our program checks how fast a website loads and tells us the moment it suddenly gets slow or starts breaking.</p>
+  <dl class="words">
+    <div><dt>ms</dt><dd>millisecond. 1,000 ms = 1 second.</dd></div>
+    <div><dt>Median</dt><dd>the middle visit. What most people get.</dd></div>
+    <div><dt>Average</dt><dd>add all times and divide. A few slow visits push it up.</dd></div>
+    <div><dt>p99</dt><dd>the slowest 1 in 100 visits. The unlucky people.</dd></div>
+  </dl>
 
   <figure class="seismo" id="hero-fig" data-labels="inline">
     <div class="chart" id="hero-chart" aria-live="off">
@@ -31,7 +37,7 @@
       <li><span class="badge">2</span>Whole site slowed down</li>
       <li><span class="badge">3</span>Search started failing</li>
     </ol>
-    <figcaption>Each point is the slowest 1% of visits (p99, in milliseconds) during a 5-minute stretch, so a taller line means slower. Red bands are the three problems we planted in the data; the red dots show where the checker raised its alarm.</figcaption>
+    <figcaption>This line shows how slow the website was over 2 days. A higher line means slower. The red stripes are the 3 problems we hid on purpose, and each red dot is the moment our program noticed.</figcaption>
   </figure>
 
   <ul class="facts">
@@ -44,12 +50,12 @@
 <!-- 2. Why the average lies -->
 <section class="wrap" id="average" aria-labelledby="h-average">
   <div class="text">
-    <h2 id="h-average">Why the average lies</h2>
-    <p>Most visits are quick, but a few are painfully slow. The average gets dragged toward those few, so it lands in a spot where almost nobody actually is. The p99 looks at the slowest 1% on purpose, so it shows what the unlucky visitors feel.</p>
+    <h2 id="h-average">Why the average can fool you</h2>
+    <p>Most visits are fast and a few are very slow. The average mixes them together, so it lands on a number that almost nobody actually got. That is why we also look at p99, the time of the slowest 1 in 100 visits.</p>
   </div>
   <figure class="plain">
     <div class="chart" id="hist-chart"></div>
-    <figcaption>How long each of the <span data-fill="requests">172,866</span> visits took. A taller bar means more visits took that long. The few visits slower than 1,000 ms are not drawn.</figcaption>
+    <figcaption>Each bar shows how many of the <span data-fill="requests">172,866</span> visits took that long. Most are on the left (fast). The thin tail on the right is the slow ones.</figcaption>
   </figure>
   <div class="text">
     <p class="analogy"><strong>The pizza test.</strong> Nine pizzas arrive in 30 minutes and one takes 180. The average delivery is 45 minutes, yet nobody actually waited 45 minutes.</p>
@@ -60,57 +66,57 @@
 <section class="wrap" id="three" aria-labelledby="h-three">
   <div class="text">
     <h2 id="h-three">One bad day, three numbers</h2>
-    <p>We compared normal minutes with the minutes of a real problem, and asked how much each number moved.</p>
+    <p>When one of the problems happened, we checked how much each number went up compared with a normal time.</p>
   </div>
   <figure class="plain">
     <div class="chart" id="diverge-chart"></div>
-    <figcaption>Change during the problem compared with normal times, all pages together.</figcaption>
+    <figcaption>How much each number changed during the problem, for the whole website.</figcaption>
   </figure>
   <div class="text">
-    <p class="pull">If you only watched the average, you'd think things got twice as slow. Users at the tail had it about five times worse.</p>
+    <p class="pull">The average said "twice as slow". The median said "nothing changed". But the slowest visitors waited about five times longer, and only p99 showed it.</p>
   </div>
 </section>
 
 <!-- 4. How the checker works -->
 <section class="wrap" id="how" aria-labelledby="h-how">
   <div class="text">
-    <h2 id="h-how">How the checker works</h2>
-    <p>Four steps, from raw records to an alarm.</p>
+    <h2 id="h-how">How our program works</h2>
+    <p>Four simple steps.</p>
   </div>
   <ol class="flow">
     <li>
       <span class="node" aria-hidden="true">1</span>
-      <h3>Visit records</h3>
-      <p>One line for every visit: which page, how long it took, and whether it failed.</p>
+      <h3>Visit list</h3>
+      <p>A list of every visit: which page, how long it took, and whether it worked.</p>
     </li>
     <li>
       <span class="node" aria-hidden="true">2</span>
-      <h3>Database (SQL)</h3>
-      <p>The lines are stored in a table, so we can ask questions of them in SQL.</p>
+      <h3>Database</h3>
+      <p>We put the list into a table so we can search it quickly.</p>
     </li>
     <li>
       <span class="node" aria-hidden="true">3</span>
       <h3><span data-fill="windowMin">5</span>-minute windows</h3>
-      <p>For each page, visits are grouped into short slices and each slice is measured.</p>
+      <p>We cut time into small 5-minute pieces, for every page.</p>
     </li>
     <li class="last">
       <span class="node" aria-hidden="true">4</span>
-      <h3>Alarm rule</h3>
-      <p>Is this slice much slower than normal, or are there too many errors? If so, raise the alarm.</p>
+      <h3>Alarm</h3>
+      <p>If a piece is much slower than normal, or has too many errors, we raise an alarm.</p>
     </li>
   </ol>
-  <p class="note text">&ldquo;Much slower than normal&rdquo; means a z-score of <span data-fill="z">4</span> or more, which almost never happens by chance.</p>
+  <p class="note text">&ldquo;Much slower than normal&rdquo; means so unusual that it would almost never happen by luck (in statistics: a z-score of <span data-fill="z">4</span> or more).</p>
 </section>
 
 <!-- 5. Every page at a glance -->
 <section class="wrap" id="pages" aria-labelledby="h-pages">
   <div class="text">
-    <h2 id="h-pages">Every page at a glance</h2>
-    <p>Each bar runs from the median (the typical visit) to the p99 (the slowest 1%). Checkout is the slowest page, and its worst visits are the furthest from typical.</p>
+    <h2 id="h-pages">Every page of the website</h2>
+    <p>The blue dot is a normal visit (median). The orange dot is a slow visit (p99). The longer the bar, the bigger the gap. Checkout has the biggest gap.</p>
   </div>
   <figure class="plain">
     <div class="pages" id="pages-chart" role="group" aria-label="Typical and slowest load time for each page"></div>
-    <figcaption>Load time in milliseconds on a stretched scale: each gridline is roughly three times the one before, so small pages stay visible.</figcaption>
+    <figcaption>Time in milliseconds (1,000 ms = 1 second). The scale is stretched so the small numbers still show.</figcaption>
   </figure>
 </section>
 
@@ -125,6 +131,6 @@
   <p class="small">Group 17, JG University, School of Engineering (B.Tech CSE). Built with help from Claude (Anthropic).</p>
 </footer>
 
-<script src="site.js?v=2"></script>
+<script src="site.js?v=3"></script>
 </body>
 </html>
