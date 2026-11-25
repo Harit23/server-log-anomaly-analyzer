@@ -1,89 +1,130 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Group 17 Project in simple words</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font:19px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#0f172a;background:#f8fafc}
-header{background:#1d4ed8;color:#fff;padding:44px 20px}
-.w{max-width:720px;margin:0 auto;padding:0 20px}
-header .w{padding:0}
-h1{font-size:clamp(28px,6vw,42px);line-height:1.2;margin:0 0 10px}
-header p{margin:0;font-size:20px;opacity:.95}
-h2{font-size:26px;margin:48px 0 10px}
-.box{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin:14px 0}
-.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#2563eb;color:#fff;font-weight:700;margin-right:10px}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.row .box{flex:1 1 200px;margin:6px 0}
-.row b{font-size:22px;display:block;margin-bottom:4px}
-.red{color:#dc2626}.green{color:#16a34a}.blue{color:#2563eb}
-.big{font-size:44px;font-weight:800;line-height:1.1}
-.note{background:#eff6ff;border-left:5px solid #2563eb;border-radius:0 12px 12px 0;padding:12px 16px;margin:16px 0}
-a{color:#2563eb}
-footer{color:#475569;font-size:15px;border-top:1px solid #e2e8f0;margin:50px 0 40px;padding-top:18px}
-</style>
+<title>Website Seismograph: Group 17</title>
+<meta name="description" content="A program that reads a website's visit records, measures how long each page takes to load, and automatically flags the moments when the site suddenly becomes unusually slow or starts showing errors.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314212B'/%3E%3Cpath d='M3 18h6l3-2 3 2 3-10 3 18 3-8h8' fill='none' stroke='%23F2A541' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
-<header><div class="w">
-<h1>Our project in simple words</h1>
-<p>Group 17 · Probability &amp; Statistics</p>
-</div></header>
-<div class="w">
+<a class="skip" href="#main">Skip to content</a>
 
-<h2>What is this project?</h2>
-<div class="box">
-When you open a website, it takes a little time to show up. Companies write down that time for every visit.<br><br>
-<b>Our job:</b> look at those times and find out when the website was slow or broken.
-</div>
+<main id="main">
 
-<h2>The pizza story</h2>
-<div class="box">
-You order pizza 10 times.<br>
-<b class="green">9 times</b> it comes in <b>30 minutes</b>.<br>
-<b class="red">1 time</b> it comes in <b>3 hours</b> (180 minutes).<br><br>
-The <b>average</b> is about <span class="big blue" style="font-size:30px">45 minutes</span><br>
-But that is wrong! Nine times it was 30. Once it was 180. Nobody ever waited 45 minutes.
-</div>
-<div class="note"><b>Main lesson:</b> The average can hide a bad day. That is the whole project.</div>
+<!-- 1. Hero -->
+<header class="hero wrap">
+  <p class="kicker">Group 17 · Probability &amp; Statistics</p>
+  <h1>We watched <span data-fill="requests">172,866</span> website visits and caught every slowdown.</h1>
+  <p class="lede">A program that reads a website's visit records, measures how long each page takes to load, and automatically flags the moments when the site suddenly becomes unusually slow or starts showing errors.</p>
 
-<h2>3 words you need</h2>
-<div class="row">
-<div class="box"><b class="blue">Average</b>Add all the times, divide by how many. One very slow visit pulls it up.</div>
-<div class="box"><b class="green">Median</b>The middle one. This is what most people really get.</div>
-<div class="box"><b class="red">p99</b>The time that 99 out of 100 visits are faster than. It shows the slowest 1%.</div>
-</div>
+  <figure class="seismo" id="hero-fig" data-labels="inline">
+    <div class="chart" id="hero-chart" aria-live="off">
+      <noscript><p class="nojs">This chart needs JavaScript. It shows 48 hours of page speed with three slowdowns marked.</p></noscript>
+    </div>
+    <ol class="legend" id="hero-legend" aria-label="Incident key">
+      <li><span class="badge">1</span>Checkout got slow</li>
+      <li><span class="badge">2</span>Whole site slowed down</li>
+      <li><span class="badge">3</span>Search started failing</li>
+    </ol>
+    <figcaption>Each point is the slowest 1% of visits (p99, in milliseconds) during a 5-minute stretch, so a taller line means slower. Red bands are the three problems we planted in the data; the red dots show where the checker raised its alarm.</figcaption>
+  </figure>
 
-<h2>What we did (5 steps)</h2>
-<div class="box"><span class="num">1</span>Made fake website records that look real: <b id="n">172,866</b> visits over 2 days.</div>
-<div class="box"><span class="num">2</span>Hid <b>3 problems</b> inside them. Because we know where, we can test our tool.</div>
-<div class="box"><span class="num">3</span>Saved everything in a database and asked it questions (SQL).</div>
-<div class="box"><span class="num">4</span>Worked out the average, median and p99 for each page.</div>
-<div class="box"><span class="num">5</span>Built a checker. Every 5 minutes it asks: <i>"Is the website much slower than normal? Are there many errors?"</i></div>
+  <ul class="facts">
+    <li><span class="big"><span data-fill="detected">3</span> of <span data-fill="total">3</span></span> problems caught</li>
+    <li><span class="big"><span data-fill="falseAlarms">0</span> false alarms</span> on <span data-fill="cleanDays">8</span> normal days</li>
+    <li><span class="big">Each caught</span> within <span data-fill="maxDelay">5</span> minutes</li>
+  </ul>
+</header>
 
-<h2>What we found</h2>
-<div class="box"><span class="big green">3 / 3</span><br>The checker found all 3 hidden problems.</div>
-<div class="box"><span class="big green">0</span><br>False alarms on normal days. It did not cry wolf.</div>
-<div class="box">In our data the <b>average</b> was <b class="blue" id="mean">116</b> ms, but the slowest 1% took more than <b class="red" id="p99">632</b> ms. About <b class="red" id="x">5</b> times more.<br>So the average hid how bad the slow visits were.</div>
+<!-- 2. Why the average lies -->
+<section class="wrap" id="average" aria-labelledby="h-average">
+  <div class="text">
+    <h2 id="h-average">Why the average lies</h2>
+    <p>Most visits are quick, but a few are painfully slow. The average gets dragged toward those few, so it lands in a spot where almost nobody actually is. The p99 looks at the slowest 1% on purpose, so it shows what the unlucky visitors feel.</p>
+  </div>
+  <figure class="plain">
+    <div class="chart" id="hist-chart"></div>
+    <figcaption>How long each of the <span data-fill="requests">172,866</span> visits took. A taller bar means more visits took that long. The few visits slower than 1,000 ms are not drawn.</figcaption>
+  </figure>
+  <div class="text">
+    <p class="analogy"><strong>The pizza test.</strong> Nine pizzas arrive in 30 minutes and one takes 180. The average delivery is 45 minutes, yet nobody actually waited 45 minutes.</p>
+  </div>
+</section>
 
-<h2>Learn more</h2>
-<div class="box">
-<a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/BEGINNER_GUIDE.md">Beginner's guide</a> (also has viva questions)<br>
-<a href="https://github.com/Harit23/server-log-anomaly-analyzer">All the code on GitHub</a><br>
-<a href="details.html">Technical page with graphs</a> (only if you want more detail)
-</div>
+<!-- 3. One bad day, three numbers -->
+<section class="wrap" id="three" aria-labelledby="h-three">
+  <div class="text">
+    <h2 id="h-three">One bad day, three numbers</h2>
+    <p>We compared normal minutes with the minutes of a real problem, and asked how much each number moved.</p>
+  </div>
+  <figure class="plain">
+    <div class="chart" id="diverge-chart"></div>
+    <figcaption>Change during the problem compared with normal times, all pages together.</figcaption>
+  </figure>
+  <div class="text">
+    <p class="pull">If you only watched the average, you'd think things got twice as slow. Users at the tail had it about five times worse.</p>
+  </div>
+</section>
 
-<footer>Group 17 · JG University, School of Engineering (BTech CSE) · Built with help from Claude (Anthropic).</footer>
-</div>
-<script>
-fetch('data/results.json').then(r=>r.json()).then(R=>{
-  const A=R.describe.ALL;
-  document.getElementById('n').textContent=A.n.toLocaleString();
-  document.getElementById('mean').textContent=A.mean.toFixed(0);
-  document.getElementById('p99').textContent=A.p99.toFixed(0);
-  document.getElementById('x').textContent=A.p99_over_mean.toFixed(1);
-}).catch(()=>{});
-</script>
+<!-- 4. How the checker works -->
+<section class="wrap" id="how" aria-labelledby="h-how">
+  <div class="text">
+    <h2 id="h-how">How the checker works</h2>
+    <p>Four steps, from raw records to an alarm.</p>
+  </div>
+  <ol class="flow">
+    <li>
+      <span class="node" aria-hidden="true">1</span>
+      <h3>Visit records</h3>
+      <p>One line for every visit: which page, how long it took, and whether it failed.</p>
+    </li>
+    <li>
+      <span class="node" aria-hidden="true">2</span>
+      <h3>Database (SQL)</h3>
+      <p>The lines are stored in a table, so we can ask questions of them in SQL.</p>
+    </li>
+    <li>
+      <span class="node" aria-hidden="true">3</span>
+      <h3><span data-fill="windowMin">5</span>-minute windows</h3>
+      <p>For each page, visits are grouped into short slices and each slice is measured.</p>
+    </li>
+    <li class="last">
+      <span class="node" aria-hidden="true">4</span>
+      <h3>Alarm rule</h3>
+      <p>Is this slice much slower than normal, or are there too many errors? If so, raise the alarm.</p>
+    </li>
+  </ol>
+  <p class="note text">&ldquo;Much slower than normal&rdquo; means a z-score of <span data-fill="z">4</span> or more, which almost never happens by chance.</p>
+</section>
+
+<!-- 5. Every page at a glance -->
+<section class="wrap" id="pages" aria-labelledby="h-pages">
+  <div class="text">
+    <h2 id="h-pages">Every page at a glance</h2>
+    <p>Each bar runs from the median (the typical visit) to the p99 (the slowest 1%). Checkout is the slowest page, and its worst visits are the furthest from typical.</p>
+  </div>
+  <figure class="plain">
+    <div class="pages" id="pages-chart" role="group" aria-label="Typical and slowest load time for each page"></div>
+    <figcaption>Load time in milliseconds on a stretched scale: each gridline is roughly three times the one before, so small pages stay visible.</figcaption>
+  </figure>
+</section>
+
+</main>
+
+<footer class="wrap site-foot">
+  <ul class="links">
+    <li><a href="https://github.com/Harit23/server-log-anomaly-analyzer/blob/main/reports/BEGINNER_GUIDE.md" rel="noopener">Read the beginner's guide</a></li>
+    <li><a href="https://github.com/Harit23/server-log-anomaly-analyzer" rel="noopener">See the code on GitHub</a></li>
+    <li><a href="details.html">Technical page with all graphs</a></li>
+  </ul>
+  <p class="small">Group 17, JG University, School of Engineering (B.Tech CSE). Built with help from Claude (Anthropic).</p>
+</footer>
+
+<script src="site.js"></script>
 </body>
 </html>
