@@ -23,7 +23,7 @@ body {
   font-family: var(--font);
   font-size: 18px;
   line-height: 1.6;
-  font-variant-numeric: tabular-nums;
+  
   overflow-x: hidden;
 }
 
@@ -52,7 +52,7 @@ p { margin: 0 0 1em; }
 .seismo { margin: clamp(36px, 6vw, 64px) 0 0; }
 .chart { position: relative; width: 100%; }
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
-.chart text { font-family: var(--font); font-variant-numeric: tabular-nums; }
+.chart text { font-family: var(--font);  }
 figcaption { max-width: 680px; margin-top: 14px; font-size: 14.5px; line-height: 1.5; color: var(--muted); }
 figure { margin: 0; }
 .nojs { color: var(--muted); }
@@ -97,7 +97,7 @@ section.wrap { padding-top: clamp(72px, 11vw, 140px); }
 .pg-row .num.p99 { color: var(--amber-ink); }
 .pg-row .num i { font-style: normal; font-weight: 400; font-size: 13px; color: var(--muted); margin-left: 2px; }
 .pages svg { display: block; width: 100%; overflow: visible; }
-.pages text { font-family: var(--font); font-size: 12.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.pages text { font-family: var(--font); font-size: 12.5px; fill: var(--muted);  }
 
 /* Footer */
 .site-foot { margin-top: clamp(80px, 12vw, 160px); padding-top: 32px; padding-bottom: 56px; border-top: 1px solid var(--rule); max-width: calc(1100px + 2 * var(--gutter)); }
